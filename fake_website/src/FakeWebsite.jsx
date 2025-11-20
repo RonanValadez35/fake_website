@@ -300,7 +300,7 @@ const PurchaseAgreementPortal = () => {
               </div>
               <div>
                 <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">
-                  Purchase Agreement Portal
+                  Cisco Agreement Portal
                 </h1>
                 <p className="text-slate-300 mt-2 text-lg font-medium">Professional document generation and management</p>
               </div>
@@ -349,7 +349,7 @@ const PurchaseAgreementPortal = () => {
                     <FileText size={24} className="text-white" />
                   </div>
                   <div>
-                    <h2 className="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Purchase Agreement Form</h2>
+                    <h2 className="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Cisco Agreement Form</h2>
                     <p className="text-slate-600 font-medium">Complete all required fields to generate your professional purchase agreement document</p>
                   </div>
                 </div>
@@ -487,7 +487,7 @@ const PurchaseAgreementPortal = () => {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
-              <p className="text-sm font-semibold text-slate-200">© 2024 Purchase Agreement Portal</p>
+              <p className="text-sm font-semibold text-slate-200">© 2024 Cisco Agreement Portal</p>
               <p className="text-xs text-slate-400 mt-1">All rights reserved</p>
             </div>
             <div className="flex items-center gap-2">
