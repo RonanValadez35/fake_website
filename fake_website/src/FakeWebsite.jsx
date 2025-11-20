@@ -19,8 +19,11 @@ const PurchaseAgreementPortal = () => {
 
   const sendEmailToBackend = async (formData, action) => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      const response = await fetch(`${apiUrl}/api/send-email`, {
+      // In production on Vercel, use relative path (same domain)
+      // In development, use the backend server URL
+      const apiUrl = import.meta.env.VITE_API_URL || 
+        (import.meta.env.DEV ? 'http://localhost:3001' : '/api');
+      const response = await fetch(`${apiUrl}/send-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

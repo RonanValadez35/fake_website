@@ -54,34 +54,25 @@ This guide will help you deploy the Purchase Agreement Portal frontend to Vercel
 
 ## Step 3: Configure Environment Variables
 
-**Important:** You need to set the backend API URL in Vercel.
+**Important:** Set these in Vercel for the serverless functions.
 
 1. In your Vercel project dashboard, go to **Settings** → **Environment Variables**
 
-2. Add the following variable:
-   - **Name:** `VITE_API_URL`
-   - **Value:** Your backend server URL
-     - For production: `https://your-backend-domain.com`
-     - For testing: `http://localhost:3001` (if backend is local)
-   - **Environment:** Production, Preview, Development (select all)
+2. Add these variables (for Production, Preview, and Development):
+   - `EMAIL_SERVICE` = `gmail`
+   - `EMAIL_USER` = `your-email@gmail.com`
+   - `EMAIL_PASSWORD` = `your-16-char-app-password` (Gmail App Password)
+   - `RECIPIENT_EMAIL` = `rvaladez2134@gmail.com`
 
-3. **Example values:**
-   ```
-   Production: https://your-backend.herokuapp.com
-   Or: https://your-backend.railway.app
-   Or: https://your-backend.render.com
-   ```
+3. **Note:** You don't need `VITE_API_URL` - the frontend uses relative paths (`/api`) since everything is on the same domain.
 
-## Step 4: Deploy Backend (If Not Already Done)
+## Step 4: Backend is Already Included!
 
-Your backend needs to be deployed separately. Options:
+✅ Your backend is now part of this Vercel project as serverless functions in the `api/` folder:
+- `/api/send-email` - Handles email sending
+- `/api/health` - Health check endpoint
 
-- **Railway:** https://railway.app
-- **Render:** https://render.com
-- **Heroku:** https://heroku.com
-- **DigitalOcean App Platform:** https://www.digitalocean.com/products/app-platform
-
-See `server/README.md` for backend deployment instructions.
+No separate backend deployment needed! Everything runs on Vercel.
 
 ## Step 5: Update CORS (Backend)
 

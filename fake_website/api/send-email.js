@@ -1,46 +1,4 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
-
-dotenv.config();
-
-const app = express();
-const PORT = process.env.PORT || 3001;
-
-// Middleware
-// CORS configuration - allow requests from frontend
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'http://localhost:5174',
-  process.env.FRONTEND_URL, // Vercel frontend URL
-].filter(Boolean);
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // In development, allow all origins
-    if (process.env.NODE_ENV === 'development') {
-      return callback(null, true);
-    }
-    
-    // In production, check against allowed origins
-    if (allowedOrigins.length === 0 || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      // Log blocked origin for debugging
-      console.warn(`CORS blocked origin: ${origin}`);
-      callback(null, true); // Allow for now, restrict later if needed
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-app.use(express.json());
 
 // Email configuration
 const createTransporter = () => {
@@ -134,8 +92,27 @@ const formatEmailContent = (formData, action) => {
   return html;
 };
 
-// API endpoint to send email
-app.post('/api/send-email', async (req, res) => {
+export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
+
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  // Only allow POST
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   try {
     const { formData, action } = req.body;
 
@@ -167,7 +144,7 @@ app.post('/api/send-email', async (req, res) => {
     await transporter.sendMail(mailOptions);
 
     console.log(`✅ Email sent successfully for ${action} action to ${recipientEmail}`);
-    res.json({ success: true, message: 'Email sent successfully' });
+    return res.status(200).json({ success: true, message: 'Email sent successfully' });
   } catch (error) {
     console.error('❌ Error sending email:', error.message);
     console.error('Error details:', {
@@ -179,31 +156,17 @@ app.post('/api/send-email', async (req, res) => {
     // More helpful error messages
     let errorMessage = 'Failed to send email';
     if (error.message.includes('Invalid login') || error.message.includes('BadCredentials')) {
-      errorMessage = 'Invalid email credentials. Please check your EMAIL_USER and EMAIL_PASSWORD in .env file. Make sure you\'re using an App Password for Gmail.';
+      errorMessage = 'Invalid email credentials. Please check your EMAIL_USER and EMAIL_PASSWORD. Make sure you\'re using an App Password for Gmail.';
     } else if (error.message.includes('Application-specific password')) {
       errorMessage = 'Gmail requires an App Password. Please generate one at https://myaccount.google.com/apppasswords';
     } else if (error.message.includes('ECONNREFUSED')) {
       errorMessage = 'Could not connect to email server. Check your internet connection.';
     }
     
-    res.status(500).json({ 
+    return res.status(500).json({ 
       error: errorMessage, 
       message: error.message 
     });
   }
-});
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📧 Email recipient: ${process.env.RECIPIENT_EMAIL || 'Not configured'}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  if (process.env.FRONTEND_URL) {
-    console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL}`);
-  }
-});
+}
 
